@@ -7,9 +7,9 @@ export const handler = async (event) => {
     const body = JSON.parse(event.body);
 
     // CONFIGURATION - Put your actual DNSExit details here
-    const API_KEY = "YOUR_DNSEXIT_API_KEY"; 
-    const ROOT_DOMAIN = "domain.com"; // The main domain managed on DNSExit
-    const MY_SUBDOMAIN = "yourname";   // Your parent subdomain tier
+    const API_KEY = "H68KmL2ndhaumvRa2GlMedW7jA1WOo"; 
+    const ROOT_DOMAIN = "work.gd"; // The main domain managed on DNSExit
+    const MY_SUBDOMAIN = "honkpage3";   // Your parent subdomain tier
 
     const fullRecordName = `${body.prefix}.${MY_SUBDOMAIN}`;
 
