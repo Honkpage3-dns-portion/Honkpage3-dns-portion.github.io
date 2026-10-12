@@ -1,16 +1,32 @@
 export const handler = async (event) => {
+  if (event.httpMethod === "OPTIONS") {
+    return {
+      statusCode: 200,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "Content-Type",
+        "Access-Control-Allow-Methods": "POST, OPTIONS"
+      },
+      body: ""
+    };
+  }
+
   if (event.httpMethod !== "POST") {
-    return { statusCode: 405, body: JSON.stringify({ error: "Method Not Allowed" }) };
+    return { 
+      statusCode: 405, 
+      body: JSON.stringify({ error: "Method Not Allowed" }) 
+    };
   }
 
   try {
     const body = JSON.parse(event.body);
 
-    // CONFIGURATION - Put your actual DNSExit details here
+    // CONFIGURATION - Fully synced to your specific credentials
     const API_KEY = "H68KmL2ndhaumvRa2GlMedW7jA1WOo"; 
-    const ROOT_DOMAIN = "work.gd"; // The main domain managed on DNSExit
-    const MY_SUBDOMAIN = "honkpage3";   // Your parent subdomain tier
+    const ROOT_DOMAIN = "work.gd"; 
+    const MY_SUBDOMAIN = "honkpage3";   
 
+    // This creates the nested record name (e.g., prefix.honkpage3)
     const fullRecordName = `${body.prefix}.${MY_SUBDOMAIN}`;
 
     const dnsexitPayload = {
@@ -33,13 +49,25 @@ export const handler = async (event) => {
 
     const data = await dnsExitResponse.json();
 
-    if (data.code === 0 || data.status === "Success") {
-      return { statusCode: 200, body: JSON.stringify({ success: true }) };
+    if (data.code === 0 || data.status === "Success" || data.code === "0") {
+      return {
+        statusCode: 200,
+        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+        body: JSON.stringify({ success: true })
+      };
     } else {
-      return { statusCode: 400, body: JSON.stringify({ error: data.message || "DNSExit rejected request" }) };
+      return {
+        statusCode: 400,
+        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+        body: JSON.stringify({ error: data.message || "DNSExit rejected request" })
+      };
     }
 
   } catch (err) {
-    return { statusCode: 500, body: JSON.stringify({ error: "Internal Server Error" }) };
+    return { 
+      statusCode: 500, 
+      headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+      body: JSON.stringify({ error: err.message || "Internal Server Error" }) 
+    };
   }
 };
