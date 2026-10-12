@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Subdomain Creator</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #f4f4f7; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+    .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+    h2 { margin-top: 0; color: #333; }
+    label { display: block; margin: 12px 0 6px; font-weight: bold; color: #555; }
+    input, select, button { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 6px; font-size: 16px; }
+    button { background: #0070f3; color: white; border: none; font-weight: bold; margin-top: 20px; cursor: pointer; }
+    button:hover { background: #0051cb; }
+    .suffix { color: #888; font-size: 14px; margin-top: 4px; display: block; }
+    #message { margin-top: 15px; padding: 10px; border-radius: 6px; display: none; font-weight: 500; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Create a Subdomain</h2>
+    <form id="dnsForm">
+      <label for="prefix">Your Subdomain Prefix</label>
+      <input type="text" id="prefix" placeholder="e.g., friend, test" required>
+      <span class="suffix">.yourname.domain.com</span>
+
+      <label for="type">Record Type</label>
+      <select id="type" onchange="toggleContentField()">
+        <option value="CNAME">CNAME (Points to a domain)</option>
+        <option value="A">A Record (Points to an IP)</option>
+      </select>
+
+      <label for="content" id="contentLabel">Target Destination</label>
+      <input type="text" id="content" placeholder="e.g., myserver.com" required>
+
+      <button type="submit">Generate Subdomain</button>
+    </form>
+    <div id="message"></div>
+  </div>
+
+  <script>
+    function toggleContentField() {
+      const type = document.getElementById('type').value;
+      const input = document.getElementById('content');
+      input.placeholder = type === 'CNAME' ? 'e.g., myserver.com' : 'e.g., 192.0.2.1';
+    }
+
+    document.getElementById('dnsForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const msgDiv = document.getElementById('message');
+      msgDiv.style.display = 'block';
+      msgDiv.style.background = '#e1f5fe';
+      msgDiv.style.color = '#0288d1';
+      msgDiv.textContent = 'Processing request...';
+
+      const payload = {
+        prefix: document.getElementById('prefix').value.trim(),
+        type: document.getElementById('type').value,
+        content: document.getElementById('content').value.trim()
+      };
+
+      try {
+        const res = await fetch('/.netlify/functions/create-dns', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const result = await res.json();
+        
+        if (res.ok) {
+          msgDiv.style.background = '#e8f5e9';
+          msgDiv.style.color = '#2e7d32';
+          msgDiv.textContent = 'Success! Your subdomain has been created.';
+        } else {
+          throw new Error(result.error || 'Failed to update DNS');
+        }
+      } catch (err) {
+        msgDiv.style.background = '#ffebee';
+        msgDiv.style.color = '#c62828';
+        msgDiv.textContent = 'Error: ' + err.message;
+      }
+    });
+  </script>
+</body>
+</html>
