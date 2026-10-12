@@ -1,0 +1,24 @@
+name: Process Web DNS Requests
+on:
+  repository_dispatch:
+    types: [web_subdomain_request]
+
+jobs:
+  update-dns:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy Record to DNSExit
+        run: |
+          curl -X POST https://dnsexit.com \
+            -H "Content-Type: application/json" \
+            -d '{
+              "apikey": "${{ secrets.DNSEXIT_API_KEY }}",
+              "domain": "work.gd",
+              "add": [
+                {
+                  "type": "${{ github.event.client_payload.type }}",
+                  "name": "${{ github.event.client_payload.prefix }}.honkpage3",
+                  "content": "${{ github.event.client_payload.content }}"
+                }
+              ]
+            }'
