@@ -90,6 +90,24 @@
     }
   });
 </script>
+<script>
+  document.getElementById('dnsForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    const prefix = document.getElementById('prefix').value.trim().toLowerCase();
+    const type = document.getElementById('type').value;
+    const content = document.getElementById('content').value.trim();
+
+    // Builds a public issue submission template link
+    const title = encodeURIComponent(`[Subdomain Request] ${prefix}`);
+    const body = encodeURIComponent(`### Prefix\n${prefix}\n\n### Type\n${type}\n\n### Destination\n${content}`);
+    
+    // Redirects the user directly to the public GitHub issue creator with fields filled
+    const targetUrl = `https://github.com{title}&body=${body}`;
+    
+    window.location.href = targetUrl;
+  });
+</script>
 
 </body>
 </html>
