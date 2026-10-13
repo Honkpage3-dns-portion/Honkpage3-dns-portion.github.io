@@ -1,13 +1,26 @@
-name: Process Web DNS Requests
+name: Public Subdomain Automator
 on:
-  repository_dispatch:
-    types: [web_subdomain_request]
+  issues:
+    types: [opened]
 
 jobs:
-  update-dns:
+  build-dns:
+    if: startsWith(github.event.issue.title, '[Subdomain Request]')
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy Record to DNSExit
+      - name: Parse Issue Body
+        id: parse
+        run: |
+          BODY="${{ github.event.issue.body }}"
+          PREFIX=$(echo "$BODY" | awk '/### Prefix/{getline; print}')
+          TYPE=$(echo "$BODY" | awk '/### Type/{getline; print}')
+          CONTENT=$(echo "$BODY" | awk '/### Destination/{getline; print}')
+          
+          echo "prefix=$PREFIX" >> $GITHUB_OUTPUT
+          echo "type=$TYPE" >> $GITHUB_OUTPUT
+          echo "content=$CONTENT" >> $GITHUB_OUTPUT
+
+      - name: Send API Request to DNSExit
         run: |
           curl -X POST https://dnsexit.com \
             -H "Content-Type: application/json" \
@@ -16,9 +29,15 @@ jobs:
               "domain": "work.gd",
               "add": [
                 {
-                  "type": "${{ github.event.client_payload.type }}",
-                  "name": "${{ github.event.client_payload.prefix }}.honkpage3",
-                  "content": "${{ github.event.client_payload.content }}"
+                  "type": "${{ steps.parse.outputs.type }}",
+                  "name": "${{ steps.parse.outputs.prefix }}.honkpage3",
+                  "content": "${{ steps.parse.outputs.content }}"
                 }
               ]
             }'
+
+      - name: Close Request Issue
+        run: |
+          gh issue close ${{ github.event.issue.number }} --comment "Success! Your subdomain has been registered on DNSExit."
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
