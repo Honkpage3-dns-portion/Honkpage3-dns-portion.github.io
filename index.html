@@ -29,8 +29,8 @@
   <form id="dnsForm">
     <label for="prefix">Subdomain Name</label>
     <div class="input-group">
-      <!-- FIXED: Changed pattern attribute to use a standard unescaped anchor "\$" character -->
-      <input type="text" id="prefix" class="has-suffix" placeholder="example" required pattern="^[a-zA-Z0-9\-]+\$" title="Only alphanumeric characters and hyphens are allowed.">
+      <!-- FIXED: Changed pattern attribute to use a standard unescaped anchor "\$" character --><!-- FIXED: Removed the unnecessary anchors and the broken backslash escape -->
+<input type="text" id="prefix" class="has-suffix" placeholder="example" required pattern="[a-zA-Z0-9\-]+" title="Only alphanumeric characters and hyphens are allowed.">
       <span class="suffix">.honkpage3.work.gd</span>
     </div>
 
