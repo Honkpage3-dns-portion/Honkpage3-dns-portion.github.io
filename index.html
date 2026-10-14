@@ -68,10 +68,9 @@
     
     const targetRepo = 'Honkpage3-dns-portion/Honkpage3-dns-portion.github.io';
     
-    // FIXED: Added missing "\$" to template variable and fixed missing forward slash
+    // Fixed string interpolation
     const targetUrl = `https://github.com{targetRepo}/issues/new?title=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}`;
     
-    // Clean redirect optimized for top-level GitHub Pages usage
     window.location.href = targetUrl;
   });
 </script>
