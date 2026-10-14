@@ -1,4 +1,5 @@
 name: Public Subdomain Automator
+
 on:
   issues:
     types: [opened]
