@@ -66,14 +66,13 @@
     const title = `[Subdomain Request] ${prefix}`;
     const body = `### Prefix\n${prefix}\n\n### Type\n${type}\n\n### Destination\n${content}`;
     
-    const targetRepo = 'Honkpage3-dns-portion/Honkpage3-dns-portion.github.io';
-    
-    // Fixed string interpolation
-    const targetUrl = `https://github.com{targetRepo}/issues/new?title=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}`;
+    // Explicit static URL to completely bypass potential JavaScript string replacement bugs
+    const targetUrl = `https://github.com{encodeURIComponent(title)}&body=${encodeURIComponent(body)}`;
     
     window.location.href = targetUrl;
   });
 </script>
+
 
 </body>
 </html>
