@@ -12,9 +12,9 @@ jobs:
         id: parse
         run: |
           BODY="${{ github.event.issue.body }}"
-          PREFIX=$(echo "$BODY" | awk '/### Prefix/{getline; print}')
-          TYPE=$(echo "$BODY" | awk '/### Type/{getline; print}')
-          CONTENT=$(echo "$BODY" | awk '/### Destination/{getline; print}')
+          PREFIX=$(echo "$BODY" | awk '/### Prefix/{getline; print}' | xargs)
+          TYPE=$(echo "$BODY" | awk '/### Type/{getline; print}' | xargs)
+          CONTENT=$(echo "$BODY" | awk '/### Destination/{getline; print}' | xargs)
           
           echo "prefix=$PREFIX" >> $GITHUB_OUTPUT
           echo "type=$TYPE" >> $GITHUB_OUTPUT
@@ -24,17 +24,19 @@ jobs:
         run: |
           curl -X POST https://dnsexit.com \
             -H "Content-Type: application/json" \
-            -d '{
-              "apikey": "${{ secrets.DNSEXIT_API_KEY }}",
-              "domain": "work.gd",
-              "add": [
-                {
-                  "type": "${{ steps.parse.outputs.type }}",
-                  "name": "${{ steps.parse.outputs.prefix }}.honkpage3",
-                  "content": "${{ steps.parse.outputs.content }}"
-                }
-              ]
-            }'
+            -d @- <<EOF
+          {
+            "apikey": "${{ secrets.DNSEXIT_API_KEY }}",
+            "domain": "work.gd",
+            "add": [
+              {
+                "type": "${{ steps.parse.outputs.type }}",
+                "name": "${{ steps.parse.outputs.prefix }}.honkpage3",
+                "content": "${{ steps.parse.outputs.content }}"
+              }
+            ]
+          }
+          EOF
 
       - name: Close Request Issue
         run: |
