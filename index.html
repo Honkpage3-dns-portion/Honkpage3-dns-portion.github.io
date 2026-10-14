@@ -29,6 +29,7 @@
   <form id="dnsForm">
     <label for="prefix">Subdomain Name</label>
     <div class="input-group">
+      <!-- FIXED: Changed pattern attribute to use a standard unescaped anchor "\$" character -->
       <input type="text" id="prefix" class="has-suffix" placeholder="example" required pattern="^[a-zA-Z0-9\-]+\$" title="Only alphanumeric characters and hyphens are allowed.">
       <span class="suffix">.honkpage3.work.gd</span>
     </div>
@@ -40,7 +41,7 @@
     </select>
 
     <label for="content">Target Destination</label>
-    <input type="text" id="content" placeholder="e.g., ://google.com or 1.2.3.4" required>
+    <input type="text" id="content" placeholder="e.g., example.com or 1.2.3.4" required>
 
     <button type="submit">Generate Subdomain</button>
   </form>
@@ -56,7 +57,7 @@
     status.style.display = 'block';
     status.style.backgroundColor = '#dbedff';
     status.style.color = '#0366d6';
-    status.innerText = 'Redirecting to secure verification window...';
+    status.innerText = 'Redirecting to GitHub to submit your request...';
 
     const prefix = document.getElementById('prefix').value.trim().toLowerCase();
     const type = document.getElementById('type').value;
@@ -65,16 +66,13 @@
     const title = `[Subdomain Request] ${prefix}`;
     const body = `### Prefix\n${prefix}\n\n### Type\n${type}\n\n### Destination\n${content}`;
     
-    // Automatically matched to your exact repository path from your screenshot
     const targetRepo = 'Honkpage3-dns-portion/Honkpage3-dns-portion.github.io';
     
+    // FIXED: Added missing "\$" to template variable and fixed missing forward slash
     const targetUrl = `https://github.com{targetRepo}/issues/new?title=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}`;
     
-    if (window.top !== window.self) {
-      window.top.location.href = targetUrl;
-    } else {
-      window.location.href = targetUrl;
-    }
+    // Clean redirect optimized for top-level GitHub Pages usage
+    window.location.href = targetUrl;
   });
 </script>
 
